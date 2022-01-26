@@ -69,6 +69,10 @@ class Game extends React.Component {
       xIsNext: !this.state.xIsNext,
       stepNumber: this.state.stepNumber + 1,
     })
+
+    if (this.state.stepNumber + 1 === 9 && !calculateWinner(squares)) {
+      setTimeout(() => {alert('Draw game :)')}, 10);
+    }
   }
 
   jumpTo(step) {
@@ -85,7 +89,6 @@ class Game extends React.Component {
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
-    const winner = calculateWinner(current.squares);
 
     const moves = history.map((step, move) => {
       let desc = move > 0 ? `Go to move #${move}` : `Go to game start`;
@@ -110,11 +113,16 @@ class Game extends React.Component {
       moves.reverse();
     }
 
+    const winner = calculateWinner(current.squares);
     let status;
     if (winner) {
       status = `Winner: ${winner}`;
     } else {
-      status = `Next player: ${this.state.xIsNext ? 'X' : `O`}`;
+      if (this.state.stepNumber === 9) {
+        status = <mark>{'Draw game'}</mark>;
+      } else {
+        status = `Next player: ${this.state.xIsNext ? 'X' : `O`}`;
+      }
     }
 
     return (
