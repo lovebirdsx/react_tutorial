@@ -99,10 +99,6 @@ class Game extends React.Component {
         desc += ' ' + toLocateString(locate);
       }
 
-      if (move === this.state.stepNumber) {
-        desc = `${desc}`;
-      }
-
       return (
         <li key={move}>
           <button 
