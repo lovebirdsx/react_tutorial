@@ -44,6 +44,7 @@ class Game extends React.Component {
         }
       ],
       xIsNext: true,
+      isHistoryAsc: true,
       stepNumber: 0,
     }
   }
@@ -100,6 +101,10 @@ class Game extends React.Component {
       );
     });
 
+    if (!this.state.isHistoryAsc) {
+      moves.reverse();
+    }
+
     let status;
     if (winner) {
       status = `Winner: ${winner}`;
@@ -116,8 +121,16 @@ class Game extends React.Component {
           />
         </div>
         <div className="game-info">
-          <div>{status}</div>
-          <ol>{moves}</ol>
+          <li>{status}</li>
+          <li>
+            <button
+              onClick={() => this.setState({isHistoryAsc: !this.state.isHistoryAsc})}>
+              {'Sort by ' + (this.state.isHistoryAsc ? 'Asc' : 'Desc')}
+            </button>
+          </li>
+          <ol>
+            {moves}
+          </ol>
         </div>
       </div>
     );
