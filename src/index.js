@@ -2,16 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-// class Square extends React.Component {
-//   render() {
-//     return (
-//       <button className="square" onClick={() => this.props.onClick()}>
-//         {this.props.value}
-//       </button>
-//     );
-//   }
-// }
-
 function Square(props) {
   return (
     <button className='square' onClick={props.onClick}>
@@ -102,7 +92,12 @@ class Game extends React.Component {
     const winner = calculateWinner(current.squares);
 
     const moves = history.map((step, move) => {
-      const desc = move > 0 ? `Go to move #${move}` : `Go to game start`;
+      let desc = move > 0 ? `Go to move #${move}` : `Go to game start`;
+
+      const locate = calculateLocate(history, move);
+      if (locate !== null) {
+        desc += ' ' + toLocateString(locate);
+      }
       return (
         <li key={move}>
           <button onClick={() => this.jumpTo(move)}>{desc}</button>
@@ -161,4 +156,28 @@ function calculateWinner(squares) {
     }
   }
   return null;
+}
+
+function calculateLocate(history, step) {
+  if (step === 0) {
+    return null;
+  }
+
+  const squares0 = history[step - 1].squares;
+  const squares1 = history[step].squares;
+  for (let i = 0; i < squares0.length; i++) {
+    const s0 = squares0[i];
+    const s1 = squares1[i];
+    if (s1 !== s0) {
+      return i;
+    }
+  }
+  
+  throw Error('Can not reach this line');
+}
+
+function toLocateString(id) {
+  const row = parseInt(id / 3);
+  const col = id % 3;
+  return `(${row + 1}, ${col + 1})`;
 }
