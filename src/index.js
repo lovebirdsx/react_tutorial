@@ -5,16 +5,18 @@ import './index.css';
 function Square(props) {
   return (
     <button className='square' onClick={props.onClick}>
-      {props.value}
+      {props.highlight ? <mark>{props.value}</mark> : props.value}
     </button>
   )
 }
 
-class Board extends React.Component {  
+class Board extends React.Component {
 
-  renderSquare(i) {
+  renderSquare(i, highlight) {
     return (
       <Square
+        key={i}
+        highlight={highlight}
         value={this.props.squares[i]}
         onClick={() => this.props.onClick(i)}
       />
@@ -23,12 +25,15 @@ class Board extends React.Component {
 
   render() {
     const rows = [];
+    const lines = calculateOkLine(this.props.squares);
     for (let r = 0; r < 3; r++) {
       const cols = [];
       for (let c = 0; c < 3; c++) {
-        cols.push(this.renderSquare(c + r * 3));
+        const id = c + r * 3;
+        const highlight = lines && lines.includes(id);
+        cols.push(this.renderSquare(id, highlight));
       }
-      rows.push(<div className='board-row'>{cols}</div>);
+      rows.push(<div key={r} className='board-row'>{cols}</div>);
     }
     return (<div>{rows}</div>);
   }
@@ -121,8 +126,8 @@ class Game extends React.Component {
           />
         </div>
         <div className="game-info">
-          <li>{status}</li>
-          <li>
+          <li key={0}>{status}</li>
+          <li key={1}>
             <button
               onClick={() => this.setState({isHistoryAsc: !this.state.isHistoryAsc})}>
               {'Sort by ' + (this.state.isHistoryAsc ? 'Asc' : 'Desc')}
@@ -141,8 +146,9 @@ class Game extends React.Component {
 
 ReactDOM.render(<Game />, document.getElementById('root'));
 
-function calculateWinner(squares) {
-  const lines = [
+
+function getLines() {
+  return [
     [0, 1, 2],
     [3, 4, 5],
     [6, 7, 8],
@@ -152,6 +158,10 @@ function calculateWinner(squares) {
     [0, 4, 8],
     [2, 4, 6],
   ];
+}
+
+function calculateWinner(squares) {
+  const lines = getLines();
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i]
     const sa = squares[a];
@@ -160,6 +170,22 @@ function calculateWinner(squares) {
       const sc = squares[c];
       if (sa === sb && sa === sc) {
         return sa
+      }
+    }
+  }
+  return null;
+}
+
+function calculateOkLine(squares) {
+  const lines = getLines();
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i]
+    const sa = squares[a];
+    if (sa) {
+      const sb = squares[b];
+      const sc = squares[c];
+      if (sa === sb && sa === sc) {
+        return lines[i];
       }
     }
   }
